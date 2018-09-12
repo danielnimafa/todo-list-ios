@@ -12,14 +12,17 @@ class TodoListVC: UITableViewController {
     
     var itemArray = [Item]()
     
-    let defaults = UserDefaults.standard
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
+    
+//    let defaults = UserDefaults.standard
+    
     
     let ARRAY_TAG = "TodoListData"
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // populateData()
+        print(dataFilePath)
         
         let item1 = Item()
         item1.title = "Bejo"
@@ -62,6 +65,8 @@ class TodoListVC: UITableViewController {
         let item = itemArray[indexPath.row]
         item.done = !item.done
         
+        saveItems()
+        
         tableView.cellForRow(at: indexPath)?.accessoryType = item.done ? .checkmark : .none
         
         print("Select Action: \(item.done)")
@@ -92,7 +97,7 @@ class TodoListVC: UITableViewController {
             
             self.itemArray.append(newItem)
             
-            self.defaults.set(self.itemArray, forKey: self.ARRAY_TAG)
+            self.saveItems()
             
             self.tableView.reloadData()
         }
@@ -106,6 +111,17 @@ class TodoListVC: UITableViewController {
         
         present(alert, animated: true, completion: nil)
         
+    }
+    
+    func saveItems() {
+        let encoder = PropertyListEncoder()
+        
+        do {
+            let data = try encoder.encode(itemArray)
+            try data.write(to: dataFilePath!)
+        } catch {
+            print("Error encoding item array, \(error)")
+        }
     }
     
     private func populateData() {
