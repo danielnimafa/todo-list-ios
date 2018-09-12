@@ -24,22 +24,7 @@ class TodoListVC: UITableViewController {
         
         print(dataFilePath)
         
-        let item1 = Item()
-        item1.title = "Bejo"
-        itemArray.append(item1)
-        
-        let item2 = Item()
-        item2.title = "Sugeng"
-        itemArray.append(item2)
-        
-        let item3 = Item()
-        item3.title = "Domblang"
-        itemArray.append(item3)
-        
-//        if let items = defaults.array(forKey: ARRAY_TAG) as? [Item] {
-//            itemArray = items
-//            print("loading data from user defaults")
-//        }
+        loadItems()
         
     }
     
@@ -140,6 +125,26 @@ class TodoListVC: UITableViewController {
         
     }
     
+    func loadItems() {
+        if let data = try? Data(contentsOf: dataFilePath!) {
+            let decoder = PropertyListDecoder()
+            do {
+                itemArray = try decoder.decode([Item].self, from: data)
+            } catch {
+                print("Error decoding items \(error)")
+            }
+        }
+    }
+    
 }
+
+
+
+
+
+
+
+
+
 
 
