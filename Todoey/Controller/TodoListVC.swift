@@ -52,6 +52,10 @@ class TodoListVC: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         print("selected \(itemArray[indexPath.row ])")
         
+        // delete operation
+        /*context.delete(itemArray[indexPath.row])
+        itemArray.remove(at: indexPath.row)*/
+        
         let item = itemArray[indexPath.row]
         item.done = !item.done
         
