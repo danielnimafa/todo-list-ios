@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 class TodoListVC: UITableViewController {
     
@@ -14,7 +15,9 @@ class TodoListVC: UITableViewController {
     
     let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
     
-//    let defaults = UserDefaults.standard
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    
+    //    let defaults = UserDefaults.standard
     
     
     let ARRAY_TAG = "TodoListData"
@@ -24,9 +27,11 @@ class TodoListVC: UITableViewController {
         
         print(dataFilePath)
         
-        loadItems()
+        // loadItems()
         
     }
+    
+    // MARK:- TableView Configuration
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return itemArray.count
@@ -56,17 +61,19 @@ class TodoListVC: UITableViewController {
         
         print("Select Action: \(item.done)")
         
-//        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
-//            tableView.cellForRow(at: indexPath)?.accessoryType = .none
-//        } else {
-//            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-//        }
+        //        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
+        //            tableView.cellForRow(at: indexPath)?.accessoryType = .none
+        //        } else {
+        //            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+        //        }
         
-//        tableView.reloadData()
+        //        tableView.reloadData()
         
         tableView.deselectRow(at: indexPath, animated: true)
         
     }
+    
+    // MARK:- CRUD Operations
     
     @IBAction func addBtnPressed(_ sender: UIBarButtonItem) {
         
@@ -74,16 +81,16 @@ class TodoListVC: UITableViewController {
         
         let alert = UIAlertController(title: "Add New Todo Item", message: "", preferredStyle: .alert)
         
-        let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
+        let action = UIAlertAction(title: "Add Item", style: .default) {
+            (action) in
             print("New Item : \(textField.text!)")
             
-            let newItem = Item()
+            let newItem = Item(context: self.context)
             newItem.title = textField.text!
+            newItem.done = false
             
             self.itemArray.append(newItem)
-            
             self.saveItems()
-            
             self.tableView.reloadData()
         }
         
@@ -99,44 +106,45 @@ class TodoListVC: UITableViewController {
     }
     
     func saveItems() {
-        let encoder = PropertyListEncoder()
         
         do {
-            let data = try encoder.encode(itemArray)
-            try data.write(to: dataFilePath!)
+            try self.context.save()
         } catch {
-            print("Error encoding item array, \(error)")
+            print("Error saving context \(error)")
         }
+        
+        self.tableView.reloadData()
     }
     
     private func populateData() {
         
-//        let item1 = Item("Find my mac", false)
-//        let item2 = Item("Build something i care about", false)
-//        let item3 = Item("Mastering iOS Development", false)
-//
-//        itemArray.append(item1)
-//        itemArray.append(item2)
-//        itemArray.append(item3)
-//
-//        for number in 0...20 {
-//            itemArray.append(Item("\(number)", false))
-//        }
+        //        let item1 = Item("Find my mac", false)
+        //        let item2 = Item("Build something i care about", false)
+        //        let item3 = Item("Mastering iOS Development", false)
+        //
+        //        itemArray.append(item1)
+        //        itemArray.append(item2)
+        //        itemArray.append(item3)
+        //
+        //        for number in 0...20 {
+        //            itemArray.append(Item("\(number)", false))
+        //        }
         
     }
     
     func loadItems() {
-        if let data = try? Data(contentsOf: dataFilePath!) {
-            let decoder = PropertyListDecoder()
-            do {
-                itemArray = try decoder.decode([Item].self, from: data)
-            } catch {
-                print("Error decoding items \(error)")
-            }
-        }
+//        if let data = try? Data(contentsOf: dataFilePath!) {
+//            let decoder = PropertyListDecoder()
+//            do {
+//                itemArray = try decoder.decode([Item].self, from: data)
+//            } catch {
+//                print("Error decoding items \(error)")
+//            }
+//        }
     }
     
 }
+
 
 
 
